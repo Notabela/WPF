@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Reservoom.Commands;
 using Reservoom.Models;
 
 namespace Reservoom.ViewModels
@@ -18,14 +19,19 @@ namespace Reservoom.ViewModels
 
         public ICommand MakeReservationCommand { get; }
 
-        public ReservationListingViewModel()
+        public ReservationListingViewModel(Hotel hotel)
         {
-            _reservations = new ObservableCollection<ReservationViewModel>
-            {
-                new ReservationViewModel(new Reservation(new RoomID(1, 2), "SingletonSean", DateTime.Now, DateTime.Now)),
-                new ReservationViewModel(new Reservation(new RoomID(1, 3), "SingletonSam", DateTime.Now, DateTime.Now)),
-                new ReservationViewModel(new Reservation(new RoomID(2, 2), "SingletonDill", DateTime.Now, DateTime.Now))
-            };
+            var reservationViewModels = hotel.GetAllReservations().Select(h => new ReservationViewModel(h));
+            _reservations = new ObservableCollection<ReservationViewModel>(reservationViewModels);
+
+            //_reservations = new ObservableCollection<ReservationViewModel>
+            //{
+            //    new ReservationViewModel(new Reservation(new RoomID(1, 2), "SingletonSean", DateTime.Now, DateTime.Now)),
+            //    new ReservationViewModel(new Reservation(new RoomID(1, 3), "SingletonSam", DateTime.Now, DateTime.Now)),
+            //    new ReservationViewModel(new Reservation(new RoomID(2, 2), "SingletonDill", DateTime.Now, DateTime.Now))
+            //};
+
+            MakeReservationCommand = new NavigateCommand();
         }
     }
 
