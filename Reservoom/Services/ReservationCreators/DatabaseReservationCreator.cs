@@ -19,11 +19,14 @@ namespace Reservoom.Services.ReservationCreators
         }
 
         // can use object mapper
-        public Task CreateReservation(Reservation reservation)
+        public async Task CreateReservation(Reservation reservation)
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
                 ReservationDTO reservationDTO = ToReservationDTO(reservation);
+
+                context.Reservations.Add(reservationDTO);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -34,9 +37,9 @@ namespace Reservoom.Services.ReservationCreators
                 FloorNumber = reservation.RoomID?.FloorNumber ?? 0,
                 RoomNumber = reservation.RoomID?.RoomNumber ?? 0,
                 Username = reservation.Username,
-            StartTime = reservation.StartTime,
-            EndTime = reservation.EndTime
-            }
+                StartTime = reservation.StartTime,
+                EndTime = reservation.EndTime
+            };
         }
     }
 }
