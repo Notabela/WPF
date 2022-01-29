@@ -13,7 +13,8 @@ using Reservoom.DbContexts;
 using Reservoom.Services.ReservationProviders;
 using Reservoom.Services.ReservationConflictValidators;
 using Reservoom.Services.ReservationCreators;
-
+using Reservoom.Stores;
+using Reservoom.Services;
 
 namespace Reservoom
 {
@@ -25,6 +26,7 @@ namespace Reservoom
         private readonly string CONNECTION_STRING = @"Data Source=localhost;Initial Catalog=reservoom;Trusted_Connection=True;";
         private readonly ReservoomDbContextFactory _reservoomDbContextFactory;
         private readonly Hotel _hotel;
+        private readonly NavigationStore _navigationStore;
 
         public App()
         {
@@ -36,10 +38,12 @@ namespace Reservoom
             ReservationBook reservationBook = new ReservationBook(reservationProvider, reservationCreator, reservationConflictValidator);
 
             _hotel = new Hotel("SingletonSean Suites", reservationBook);
+            _navigationStore = new NavigationStore();
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            _navigationStore.CurrentViewModel = CreateMakeReservationViewModel();
             using (ReservoomDbContext dbContext = _reservoomDbContextFactory.CreateDbContext())
             {
                 dbContext.Database.Migrate();
@@ -48,11 +52,21 @@ namespace Reservoom
 
             MainWindow = new MainWindow()
             {
-                DataContext = new MainViewModel(_hotel)
+                DataContext = new MainViewModel(_navigationStore)
             };
 
             MainWindow.Show();
             base.OnStartup(e);
+        }
+
+        private MakeReservationViewModel CreateMakeReservationViewModel()
+        {
+            return new MakeReservationViewModel(_hotel, new NavigationService(_navigationStore, CreateReservationViewModel));
+        }
+
+        private ReservationListingViewModel CreateReservationViewModel()
+        {
+            return new ReservationListingViewModel(_hotel, new NavigationService(_navigationStore, CreateMakeReservationViewModel));
         }
     }
 }

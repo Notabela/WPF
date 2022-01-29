@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Reservoom.Exceptions;
 using Reservoom.Models;
+using Reservoom.Services;
 using Reservoom.ViewModels;
 
 namespace Reservoom.Commands
@@ -14,11 +15,15 @@ namespace Reservoom.Commands
     public class MakeReservationCommand : AsyncCommandBase
     {
         private readonly MakeReservationViewModel _makeReservationViewModel;
+        private readonly NavigationService _reservationViewNavigationService;
         private readonly Hotel _hotel;
 
-        public MakeReservationCommand(MakeReservationViewModel makeReservationViewModel, Hotel hotel)
+        public MakeReservationCommand(MakeReservationViewModel makeReservationViewModel,
+            Hotel hotel,
+            NavigationService reservationViewNavigationService)
         {
             _makeReservationViewModel = makeReservationViewModel;
+            _reservationViewNavigationService = reservationViewNavigationService;
             _hotel = hotel;
 
             _makeReservationViewModel.PropertyChanged += OnViewModelPropertyChanged;
@@ -58,6 +63,7 @@ namespace Reservoom.Commands
 
                 await _hotel.MakeReservation(reservation);
                 MessageBox.Show("Reservation was added.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                _reservationViewNavigationService.Navigate();
             }
             catch (ReservationConflictException)
             {

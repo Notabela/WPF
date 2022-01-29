@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Reservoom.Commands;
 using Reservoom.Models;
+using Reservoom.Services;
+using Reservoom.Stores;
 
 namespace Reservoom.ViewModels
 {
@@ -19,7 +21,7 @@ namespace Reservoom.ViewModels
 
         public ICommand MakeReservationCommand { get; }
 
-        public ReservationListingViewModel(Hotel hotel)
+        public ReservationListingViewModel(Hotel hotel, NavigationService makeReservationNavigationService)
         {
             var reservationViewModels = hotel.GetAllReservations().Select(h => new ReservationViewModel(h));
             _reservations = new ObservableCollection<ReservationViewModel>(reservationViewModels);
@@ -31,8 +33,15 @@ namespace Reservoom.ViewModels
             //    new ReservationViewModel(new Reservation(new RoomID(2, 2), "SingletonDill", DateTime.Now, DateTime.Now))
             //};
 
-            MakeReservationCommand = new NavigateCommand();
+            MakeReservationCommand = new NavigateCommand(makeReservationNavigationService);
         }
+
+        private void UpdateReservations()
+        {
+            _reservations.Clear();
+            
+        }
+
     }
 
 }

@@ -4,9 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Reservoom" xmlns:views="clr-namespace:Reservoom.Views"
+        xmlns:vms="clr-namespace:Reservoom.ViewModels"
         mc:Ignorable="d"
         Title="Reservoom" Height="450" Width="800">
     <Grid Margin="20 10" MaxWidth="600">
-    <views:MakeReservationView DataContext="{Binding CurrentViewModel}"/>
+    <Grid.Resources>
+      <!-- map the vms to the views, xmls above introduces the vms into our namespace-->
+      <DataTemplate DataType="{x:Type vms:MakeReservationViewModel}">
+        <views:MakeReservationView />
+      </DataTemplate>
+      
+      <DataTemplate DataType="{x:Type vms:ReservationListingViewModel}">
+        <views:ReservationListingView />
+      </DataTemplate>
+      
+    </Grid.Resources>
+      <!-- our control here binds to the view model-->
+    <ContentControl Content="{Binding CurrentViewModel}" />
   </Grid>
 </Window>
